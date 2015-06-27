@@ -128,16 +128,16 @@ for automated methods of optimization for parallel programs.
 Extensive research in the last decade produced powerful tools for
 automatically tuning programs, or \emph{autotuners}, in a variety of problem
 domains. Despite being able to achieve good results on porting the performance
-of parallel programs,these tools are not widely utilized by the scientific 
+of parallel programs,these tools are not widely utilized by the scientific
 and programming communities, perhaps because of their novelty.
 
-Autotuners can be model-based or empirical. Model-based autotuners predict 
+Autotuners can be model-based or empirical. Model-based autotuners predict
 program performance following a model of the target architecture. The model
 is built previous to the tuning and execution, during an \emph{installation}
 phase. Empirical autotuners discover the best optimization of a program by
 executing different optimized versions and measuring their performance. No
 model is built or used, instead empirical autotuner commonly use search
-techniques to explore the space defined by the possible optimizations 
+techniques to explore the space defined by the possible optimizations
 of a program, in a given architecture. Despite being arguably slower than
 model-base autotuners, given a model is already built, empirical autotuners
 can produce optimized versions of a program during tuning time. The empirical
@@ -145,20 +145,20 @@ tuning strategy allows programmers to focus their efforts in designing
 programs that explicitly expose their implementation and optimization choices,
 leaving the task of discovering the best choice to the autotuner.
 
-The search techniques used by an autotuner can target the optimization of 
-various program metrics. Simple metrics such as runtime can be obtained by 
-simply running the candidate optimization, but more complex metrics, such 
+The search techniques used by an autotuner can target the optimization of
+various program metrics. Simple metrics such as runtime can be obtained by
+simply running the candidate optimization, but more complex metrics, such
 as I/O patterns or memory accesses are not so straight-forward to measure.
-\emph{Profilers} are tools that offer such specific measurements and analysis 
-of programs during runtime. For instance, if a programmer was interested in 
-optimizing the CPU load, or the duration and depth of a function call stack 
-during the execution of her program, she could use a profiler to produce such 
+\emph{Profilers} are tools that offer such specific measurements and analysis
+of programs during runtime. For instance, if a programmer was interested in
+optimizing the CPU load, or the duration and depth of a function call stack
+during the execution of her program, she could use a profiler to produce such
 measurements to an empirical autotuner.
 
 This Introduction to Parallel Tuning aims to familiarize the reader with the
 state-of-the-art applications of autotuning techniques to the optimization
 of high-performance parallel programs. The following section discuss the
-autotuning technique under the Algorithm Selection framework. Section 
+autotuning technique under the Algorithm Selection framework. Section
 \ref{sec:insieme} discusses the INSIEME compiler project for parallel
 applications. Section \ref{sec:opentuner} describes the OpenTuner framework,
 an autotuning framework that can be used to implement autotuners for parallel
@@ -169,13 +169,30 @@ Finally, section \ref{sec:conclusion} summarizes the discussion.
 
 \section{Autotuning} \label{sec:autotuning}
 
-The idea behind autotuning is to use the performance-impacting features 
-of architectures, problems and algorithms in a domain to describe
-a \emph{search space}. Searching, optimization and Machine Learning techniques
-tailored for an application domain are then used to empirically
-search this space for optimal algorithm-to-problem mappings.
+The idea behind empirical autotuning techniques consists of using the
+performance-impacting features of architectures, problems and algorithms
+in a domain to define sets of possible algorithm implementations,
+configurations and optimizations. These sets describe a \emph{search space}
+that can then be explored by searching, optimization and Machine Learning
+techniques.
 
-The autotuning technique has been used since as early as 1997, when the PHiPAC
+In contrast, model-based autotuning uses perfomance-impacting features
+to build a model, and then uses this model to autotune an application.
+The model can be obtained by formally describing an algorithm and analysing
+its behaviour or, when building a model for a computer architecture,
+empirically exploring the search space.
+Models are then used to implement highly optimized libraries for a given
+domain, that are then used to implement programs in that domain. Different
+compiled versions of the library functions must be provided for all target
+architectures.
+
+Instead of manually exploring the search space of algorithm optimizations,
+configurations and implementations, programmers should be motivated to expose
+these features to an autotuner. This approach to designing and implementing
+computer programs is called \emph{Programming by Optimization}, and was
+first described by Hoos~\cite{hoos2012programming}.
+
+Autotuning techniques have been used since as early as 1997, when the PHiPAC
 system~\cite{bilmes1997phipac} used code generators and search scripts to
 automatically generate high performance code for matrix multiplication. Since
 then the autotuning problem has been tackled in multiple domains, with a great
@@ -185,41 +202,44 @@ OSKI~\cite{vuduc2005oski} library provides automatically tuned kernels for
 sparse matrices. The FFTW~\cite{frigo1998fftw} library provides tuned C
 subroutines for computing the Discrete Fourier Transform.
 
-More recently, there have been efforts in the implementation of generic tools
-for autotuning. PetaBricks~\cite{ansel2009petabricks} is a language, compiler
-and autotuner for generic programs, that introduce new abstractions such as the
+More recently, there have been efforts in the direction of breaking the domain
+boundaries, through the implementation of tools that generalize autotuning.
+PetaBricks~\cite{ansel2009petabricks} is a language, compiler and autotuner for
+domain-independent applications, that introduce new abstractions such as the
 \emph{either...or} keywords, which let programmers define multiple algorithms
-for a same problem. The OpenTuner framework~\cite{ansel2014opentuner} implements
-ensembles of search techniques that are used to search a user-defined space of
-program configurations. The OpenTuner framework has already been used to
-implement a domain specific language for data-flow programming
-\cite{bosboom2014streamjit} and a framework for the optimization of recursive
-parallel algorithms~\cite{eliahu2015frpa}. The ParamILS
+for a same problem. The user can define \emph{input
+features}~\cite{ding2014autotuning} for a given algorithm, which allow
+Petabricks to group and specifically optimize programs for classes of
+training inputs.
+
+The OpenTuner framework~\cite{ansel2014opentuner} implements ensembles of search
+techniques that are used to search a user-defined space of program
+configurations. OpenTuner is further discussed in section~\ref{sec:opentuner}.
+The framework has already been used to implement a domain specific language
+for data-flow programming \cite{bosboom2014streamjit}
+and a framework for the optimization of recursive parallel
+algorithms~\cite{eliahu2015frpa}. The ParamILS
 framework~\cite{hutter2009paramils} implements state-of-the-art search methods
 for algorithm configuration and parameter tuning.
-
-Some of the work on GPU autotuning~\cite{guo2010autotuningCUDA,
-dongarra2009note,grauer2012autotuningHLLGPU} aim to tune parameters such as block
-sizes, tiling techniques, transfers between single and double precision, loop
-permutations and unrolling. They worked under the assumption that these
-parameters were enough to capture the algorithmic design space and attain a
-large fraction of peak performance.
 
 In an effort to provide a common representation of multiple parallel
 programming models, the INSIEME compiler project~\cite{jordan2012multi}
 implements abstractions for OpenMP, MPI and OpenCL. The INSIEME compiler is
 able to generate optimized parallel code for heterogeneous multi-core
-architectures.
+architectures. Section~\ref{sec:insieme} discusses the INSIEME compiler project.
+
+The remaining of this section presents the \emph{Algorithm Selection Problem}
+and describes autotuning as an instance of this problem.
 
 \subsection{The Algorithm Selection Problem}
 
 The description of the Algorithm Selection Problem was first published by Rice
 in 1976~\cite{rice1976algorithm}. The problem consists in, given a set of
 \emph{algorithms} and a set of \emph{problems}, finding a \emph{mapping} of
-algorithms to problems that minimizes the time to solve all problems in the
-set. The \emph{algorithms} that compose a set can represent different
-abstractions, such as programs, heuristics, or configurations. The set of
-\emph{problems} usually contains instances of a problem.
+algorithms to problems that minimizes the time to solve all problems in the set.
+The \emph{algorithms} that compose a set can represent different abstractions,
+such as programs, heuristics, or configurations. The set of \emph{problems}
+usually contains instances of a problem.
 
 The Algorithm Selection Problem is hard. Its NP-completeness has been proved
 when calculating static distributions of algorithms in parallel machines
@@ -245,7 +265,7 @@ shown~\cite{guo2003algorithm}.
 
 \section{Conclusion} \label{sec:conclusion}
 
-\bibliographystyle{plainnat} 
+\bibliographystyle{plainnat}
 \bibliography{Introduction_to_Parallel_Tuning}
 
 \end{document}
