@@ -84,7 +84,7 @@
 \thispagestyle{empty}
 \begin{center}
     \vspace*{4cm}
-    \textbf{\Large{An Introduction to \\Parallel Tuning}}\\
+    \textbf{\Large{An Introduction to the Autotuning\\of Parallel Applications}}\\
 
     \vskip 1cm
 
@@ -233,27 +233,131 @@ and describes autotuning as an instance of this problem.
 
 \subsection{The Algorithm Selection Problem}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{algoselframe}
+    \captionsetup{width=0.64\textwidth}
+    \caption{Schematic diagram of the Algorithm Selection Problem as described by~\citet{rice1976algorithm}. Reproduction of a diagram from~\citet{smith2008cross}.}
+    \label{fig:algoselframe}
+\end{figure}
+
 The description of the Algorithm Selection Problem was first published by Rice
-in 1976~\cite{rice1976algorithm}. The problem consists in, given a set of
-\emph{algorithms} and a set of \emph{problems}, finding a \emph{mapping} of
-algorithms to problems that minimizes the time to solve all problems in the set.
-The \emph{algorithms} that compose a set can represent different abstractions,
-such as programs, heuristics, or configurations. The set of \emph{problems}
-usually contains instances of a problem.
+in 1976~\cite{rice1976algorithm}. The problem is described as follows.  Given a
+set $A$ of \emph{algorithms}, a set $P$ of \emph{problems} and a set $F$ of
+\emph{problem features}, the Algorithm Selection Problem consists of finding a
+\emph{mapping} of algorithms to problems that minimizes the time to solve all
+problems in the set, taking problem features in consideration. The
+\emph{performance space} $Y$ is composed of the measurements of each algorithm
+$\alpha \in A$ in each problem $x \in P$. 
+
+Note that the \emph{algorithms} that compose a set are not limited to
+configurations or combinations of algorithms. Each $\alpha \in A$ can represent
+different abstractions, such as programs, heuristics, or configurations. The
+set of \emph{problems} usually contains instances of a problem, and the set of
+\emph{problem features} contains representations of the performance-impacting
+features. \citet{ding2014autotuning} further discusses the feature extraction
+processes.  Figure \ref{fig:algoselframe} shows a schematic diagram for the
+Algorithm Selection Problem, as described by Rice.
+
+\citet{kotthoff2012algorithm} presents a survey of the algorithm selection
+field and its applications in combinatorial search problems.
+\citet{smith2008cross} surveys the applications of the algorithm selection
+problem to the machine learning and meta-learning fields.
 
 The Algorithm Selection Problem is hard. Its NP-completeness has been proved
 when calculating static distributions of algorithms in parallel machines
 \cite{bougeret2009combining}. Its Undecidability in the general case was also
-shown~\cite{guo2003algorithm}.
+shown~\cite{guo2003algorithm}. Therefore, methods such as \emph{Stochastic
+Local Search} can be used to approach the algorithm selection problem with good
+results, as described by~\citet{hutter2009paramils}.
 
-\section{INSIEME} \label{sec:insieme}
+\subsection{INSIEME Compiler Project} \label{sec:insieme}
 
-\section{OpenTuner} \label{sec:opentuner}
+The INSIEME Compiler Project\footnote{insieme-compiler.org} of the University 
+of Innsbruck is a C/C++ source-to-source compiler that aims to automatically 
+optimize parallel programs for heterogeneous parallel computing platforms, 
+regardless of the parallel programming tools used in the implementation of 
+the programs.
+
+INSIEME~\cite{jordan2012multi} uses the INSPIRE intermediate
+representation~\cite{jordan2013inspire} to commonly represent
+parallel programs in various parallel programming abstractions,
+such as OpenMP, MPI and OpenCL. INSIEME also offers a runtime
+system for online tuning and performance monitoring.
+
+An overview of the architectures of the INSIEME compiler and runtime
+systems is presented in Figures \ref{fig:insiemearch} and \ref{fig:insiemerun}.
+Those diagrams can be found at the INSIEME Compiler Project 
+website\footnote{insieme-compiler.org/architecture.html}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.63\textwidth]{architecture_compiler}
+    \captionsetup{width=0.64\textwidth}
+    \caption{Overview of the INSIEME compiler.}
+    \label{fig:insiemearch}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.63\textwidth]{architecture_runtime}
+    \captionsetup{width=0.64\textwidth}
+    \caption{Overview of the INSIEME runtime.}
+    \label{fig:insiemerun}
+\end{figure}
+
+The runtime uses multiple threads to schedule and distribute work. The
+optimization and scheduling choices are made based on previous executions
+of the program and on knowledge of the underlying parallel computing
+platform.
+
+\subsection{OpenTuner Framework} \label{sec:opentuner}
+
+The OpenTuner framework~\cite{ansel2014opentuner} provides domain-agnostic
+tools for defining search spaces and implementing autotuners.
+
+The search spaces are defined by instantiating the different 
+\emph{Parameter} types provided by the framework. Each parameter
+type, such as \emph{FloatParameter}, \emph{IntegerParameter} or
+\emph{BooleanParameter} implements its own manipulation functions,
+that allow the search techniques to navigate the values allowed
+to each parameter, thus exploring the search space defined by the
+user. A user of the framework can implement her own
+parameter types.
+
+OpenTuner implements ensembles of optimization and Machine 
+Learning techniques that perform well in different problem domains,
+and are used to search user-defined search spaces. The results found
+during the search process are shared between techniques through a
+common results database.
+OpenTuner uses \emph{meta-techniques} for coordinating the
+distribution of resources between techniques in an ensemble.
+
+An OpenTuner application can implement its own search techniques and
+meta-techniques, adding them to existing ensembles or creating completely
+new ones.
+By separating search space definition from search method implementation,
+OpenTuner allows fast implementation of autotuners for different
+problem domains.
+
+The search techniques implemented in OpenTuner share the results found
+through a common database. This allows techniques to benefit from each
+other's executions and reach better results faster.
+
+Figure~\ref{fig:opentuner} illustrates the main components of the framework,
+the interactions between them.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{opentuner}
+    \captionsetup{width=0.64\textwidth}
+    \caption{Main components of the OpenTuner framework and their interations. Reproduction of a diagram found in~\citet{ansel2014opentuner}.}
+    \label{fig:opentuner}
+\end{figure}
 
 \section{Profiling Tools} \label{sec:profilers}
 
 - Add table of parallel and GPU profilers.
-
 
 \section{Related Work} \label{sec:related}
 
@@ -265,7 +369,7 @@ shown~\cite{guo2003algorithm}.
 
 \section{Conclusion} \label{sec:conclusion}
 
-\bibliographystyle{plainnat}
+\bibliographystyle{plainnat} 
 \bibliography{Introduction_to_Parallel_Tuning}
 
 \end{document}
