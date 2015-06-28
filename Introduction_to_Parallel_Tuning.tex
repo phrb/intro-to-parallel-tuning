@@ -84,7 +84,7 @@
 \thispagestyle{empty}
 \begin{center}
     \vspace*{4cm}
-    \textbf{\Large{An Introduction to the Autotuning\\of Parallel Applications}}\\
+    \textbf{\Large{An Introduction to Autotuning\\Parallel Applications}}\\
 
     \vskip 1cm
 
@@ -163,8 +163,7 @@ autotuning technique under the Algorithm Selection framework. Section
 applications. Section \ref{sec:opentuner} describes the OpenTuner framework,
 an autotuning framework that can be used to implement autotuners for parallel
 applications. Section \ref{sec:profilers} list some profiling tools that can
-be used to measure metrics of parallel programs. Section \ref{sec:related}
-discusses some of the recent work on parallel automatic optimization.
+be used to measure metrics of parallel programs. 
 Finally, section \ref{sec:conclusion} summarizes the discussion.
 
 \section{Autotuning} \label{sec:autotuning}
@@ -345,7 +344,9 @@ through a common database. This allows techniques to benefit from each
 other's executions and reach better results faster.
 
 Figure~\ref{fig:opentuner} illustrates the main components of the framework,
-the interactions between them.
+the interactions between them. Note that both the Search and Measurement
+components read from and write to the Results Database. This communication
+of intermediate results effectively steers the autotuning process.
 
 \begin{figure}[H]
     \centering
@@ -357,18 +358,50 @@ the interactions between them.
 
 \section{Profiling Tools} \label{sec:profilers}
 
-- Add table of parallel and GPU profilers.
+\begin{figure}[H]
+\centering
+\begin{tabular}{ | p{2.8cm} | p{11cm} | p{2cm} |}
+\hline
+System & Features & License \\ \hline
+perf tools & Sampling profiler supporting hardware events on several architectures.  & GPL \\ \hline
+LTTng & Collects data on processes blocking, context switches, and execution time. Helps identify performance problems over multiple processes or threads.  & GPL \\ \hline
+gprof & Several tools with combined sampling and call-graph profiling. A set of visualization tools, VCG tools, uses the Call Graph Drawing Interface (CGDI) to interface with gprof.  & BSD \\ \hline
+Allinea MAP & I/O, communication, floating point operation usage, memory access costs, MPI and OpenMP support. & Proprietary \\ \hline
+Streamline & Graphical performance visualization of hardware and software for ARM CPUs, Mali GPUs, OpenCL, power consumption metrics. & Proprietary \\ \hline
+VTune & Serial and threaded performance analysis. Hotspot, call tree and threading analysis on both Intel and AMD x86 processors. Hardware event sampling that uses the on chip performance monitoring unit requires an Intel processor. & Proprietary \\ \hline
+CodeXL & GPU and CPU profilers, GPU debugger and static kernel analyzer. & Proprietary \\ \hline
+NVIDIA Visual Profiler & Performance profiling for optimizing CUDA C/C++ applications. & Proprietary \\
+\hline
+\end{tabular}
+\captionsetup{width=0.64\textwidth}
+\caption{Some profilers for parallel applications and their features.}
+\label{fig:profilers}
+\end{figure}
 
-\section{Related Work} \label{sec:related}
+Figure~\ref{fig:profilers} show some of the available profiling tools for
+parallel applications\footnote{Filtered from wikipedia.org/wiki/List\_of\_performance\_analysis\_tools.}{} and their main features. Note that there are not many open source profiling tools.
 
-\subsection{FRPA}
-
-\subsection{GPU tunning*}
-
-\subsection{Compiler Parameters*}
+The INSIEME Compiler Project references three important benchmarks for parallel
+applications which can be used as performance profilers. 
+The INNCABS\footnote{github.com/PeterTh/inncabs} cross-platform and 
+cross-library offer benchmarks for C++ parallel constructs.
+uCLbench\footnote{github.com/PeterTh/uCLbench} measures various performance
+metrics of OpenCL CPU and GPU applications, through a set of micro-benchmarks.
+MPICacheBench\footnote{github.com/motonacciu/mpi-cache-bench} measures the
+effects of CPU caches in point-to-point and collective MPI operations.
 
 \section{Conclusion} \label{sec:conclusion}
 
+This work presented a limited overview of some of the most recent research in
+parallel applications autotuning, and listed some parallel profiling tools
+and benchmarks. This work is intended to continuously evolve, and future
+work will extend the description of the INSIEME and OpenTuner systems to
+contain samples of implementations and performance analysis. Experiments
+with profiling tools and benchmarks, targeting different optimization
+objectives, will also be included. Finally, a new section describing autotuning
+applications and domain-specific autotuning systems will be included.
+
+\newpage
 \bibliographystyle{plainnat} 
 \bibliography{Introduction_to_Parallel_Tuning}
 
